@@ -1,0 +1,25 @@
+{
+  "name": "autocal-cli",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "bin/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "acal": "./bin/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autocal-core": "file:../autocal-core",
+    "yargs": "^17.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.0",
+    "@types/yargs": "^17.0.22",
+    "source-map-support": "^0.5.21"
+  }
+}
