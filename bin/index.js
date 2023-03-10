@@ -8,10 +8,15 @@ import yargs from 'yargs/yargs';
 import { log, error } from 'console';
 
 import { readConfig, savePlan } from './io.js';
+import { handleList } from './list.js';
+import { handleSet } from './set.js';
+import { handleSelect } from './select.js';
+import { handleAdd } from './add.js';
 
 const usage = '\nUsage: acal [list|get|set|select]';
 const options = yargs(process.argv.slice(2))
   .usage(usage)
+  .config(readConfig())
   .option('c', {
     alias: 'context',
     describe: 'Context Number',
@@ -36,7 +41,7 @@ const options = yargs(process.argv.slice(2))
   )
   .command(
     'add [value..]',
-    'Add context or activity to to context',
+    'Add context or activity to context',
     (yargs) => {
       yargs.positional('value', {
         describe: 'Context or Activity to add',
@@ -45,80 +50,35 @@ const options = yargs(process.argv.slice(2))
     },
     handleAdd
   )
+  .command(
+    'set [value..]',
+    'Set context or activity inside context',
+    (yargs) => {
+      yargs.positional('value', {
+        describe: 'Context or Activity to add',
+        type: 'string',
+      });
+    },
+    handleSet
+  )
+  .command(
+    'select [value..]',
+    'Set context or activity inside context',
+    (yargs) => {
+      yargs.positional('value', {
+        describe: 'Context or Activity to add',
+        type: 'string',
+      });
+    },
+    handleSelect
+  )
   .command('del', 'delete the thing')
+  .middleware([buildVal])
   .help()
   .parse().argv;
 
-function handleList(argv) {
-  let c = readConfig();
-
-  if (argv.context) {
-    // show context only
-    let opts = {
-      type: 'activity',
-      format: 'array',
-      lookup: 'display',
-      filter: 'ctx-index',
-      filterVal: argv.context - 1,
-    };
-    let acts = get(c.plan, opts);
-    acts.forEach((act, i) => {
-      log(i + 1, act);
-    });
-  } else {
-    let ctxOpts = {
-      type: 'context',
-      format: 'array',
-      lookup: 'display',
-    };
-
-    let actOpts = {
-      type: 'activity',
-      format: 'array',
-      lookup: 'display',
-      filter: 'ctx-index',
-      filterVal: 0,
-    };
-
-    let ctxs = get(c.plan, ctxOpts);
-
-    ctxs.forEach((ctx, i) => {
-      log(i + 1, ctx);
-      actOpts.filterVal = i;
-      let acts = get(c.plan, actOpts);
-      acts.forEach((act, i) => {
-        log('  ', i + 1, act);
-      });
-    });
+function buildVal(argv) {
+  if (argv.value) {
+    argv.value = argv.value.join(' ');
   }
-}
-
-function handleAdd(argv) {
-  log(argv);
-  let c = readConfig();
-  if (parseInt(argv.value) == argv.value || !argv.value) {
-    return console.log('Bad input');
-  }
-  const value = argv.value.join(' ');
-
-  let newPlan;
-  if (argv.context) {
-    // ctx set, add activity
-    let opts = {
-      type: 'activity',
-      op: 'add',
-      // 0 index = 1 for user
-      targetContextIndex: argv.context - 1,
-      value: value,
-    };
-    newPlan = set(c.plan, opts);
-  } else {
-    newPlan = set(c.plan, {
-      type: 'context',
-      op: 'add',
-      value: value,
-    });
-  }
-  log(newPlan);
-  savePlan(newPlan);
 }
