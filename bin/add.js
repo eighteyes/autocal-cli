@@ -1,7 +1,9 @@
 import { get, set, select } from 'autocal-core';
 
-import { readConfig, savePlan } from './io.js';
+import { readConfig, writePlan } from './io.js';
 import { log } from 'console';
+
+import chalk from 'chalk';
 
 export function handleAdd(argv) {
   let c = readConfig();
@@ -21,12 +23,15 @@ export function handleAdd(argv) {
       value: value,
     };
     newPlan = set(c.plan, opts);
+    log('New Activity:', chalk.green(value));
   } else {
     newPlan = set(c.plan, {
       type: 'context',
       op: 'add',
       value: value,
     });
+    log('New Context:', chalk.green(value));
   }
-  savePlan(newPlan);
+
+  writePlan(newPlan);
 }

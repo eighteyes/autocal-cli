@@ -1,7 +1,7 @@
 import { get, set, select } from 'autocal-core';
 import { log } from 'console';
 
-import { savePlan } from './io.js';
+import { writePlan } from './io.js';
 
 export function handleSet(argv) {
   log(argv);
@@ -27,5 +27,5 @@ export function handleSet(argv) {
 
     newPlan = set(argv.plan, opts);
   }
-  savePlan(newPlan);
+  writePlan(newPlan);
 }

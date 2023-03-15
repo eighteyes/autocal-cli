@@ -6,7 +6,9 @@ import { log, error } from 'console';
 
 const configDir = os.homedir() + '/.config/autocal';
 const configFile = 'config.json';
+const planFile = 'plan.acr';
 const configLoc = path.join(configDir, configFile);
+const planLoc = path.join(configDir, planFile);
 
 export function readConfig() {
   // make if none
@@ -15,22 +17,20 @@ export function readConfig() {
   }
 
   if (!fs.existsSync(configLoc)) {
-    let config = { plan: '' };
-    fs.writeFileSync(configLoc, JSON.stringify(config));
+    writeConfig({ pattern: '+-+', selectionCount: 3 });
+    writePlan('');
   }
 
-  return JSON.parse(
-    fs.readFileSync(path.join(configDir, configFile)).toString()
-  );
+  return {
+    config: JSON.parse(fs.readFileSync(configLoc).toString()),
+    plan: JSON.parse(fs.readFileSync(planLoc).toString()),
+  };
 }
 
 export function writeConfig(config) {
-  log('Writing', config);
   fs.writeFileSync(path.join(configDir, configFile), JSON.stringify(config));
 }
 
-export function savePlan(plan) {
-  let c = readConfig();
-  c.plan = plan;
-  writeConfig(c);
+export function writePlan(plan) {
+  fs.writeFileSync(planLoc, JSON.stringify(plan));
 }
