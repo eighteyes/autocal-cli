@@ -14,6 +14,8 @@ import { handleSelect } from './select.js';
 import { handleAdd } from './add.js';
 
 import chalk from 'chalk';
+import { handleSetConfig } from './config.js';
+import { handleMakePlan } from './gpt.js';
 
 const usage = '\nUsage: acal [list|get|set|select]';
 const options = yargs(process.argv.slice(2))
@@ -78,6 +80,18 @@ const options = yargs(process.argv.slice(2))
       });
     },
     handleSelect
+  )
+  .command('config', 'Configure AutoCal CLI', () => {}, handleSetConfig)
+  .command(
+    'plan [value..]',
+    'Configure AutoCal CLI',
+    (yargs) => {
+      yargs.positional('value', {
+        describe: 'Brief description of the plan',
+        type: 'string',
+      });
+    },
+    handleMakePlan
   )
   .command('del', 'delete the thing')
   .middleware([buildVal, setCtx])
