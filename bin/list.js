@@ -1,17 +1,22 @@
 import { get } from 'autocal-core';
 
-import { readConfig, writePlan } from './io.js';
+import { readConfig, readPlans, writePlan } from './io.js';
 
 import { log } from 'console';
+
+export function handleListAll(argv) {
+  readPlans();
+}
 
 export function handleList(argv) {
   log(argv);
 
-  if (argv.plan.length == 0) {
+  if (argv.planText.length == 0) {
     return console.log(
       'No plan set. Use `acal add` to create Contexts and Activities.'
     );
   }
+
   if (argv.context) {
     // show context only
     let opts = {
@@ -21,7 +26,7 @@ export function handleList(argv) {
       filter: 'ctx-index',
       filterVal: argv.context - 1,
     };
-    let acts = get(c.plan, opts);
+    let acts = get(argv.planText, opts);
     acts.forEach((act, i) => {
       log(i + 1, act);
     });
@@ -40,12 +45,12 @@ export function handleList(argv) {
       filterVal: 0,
     };
 
-    let ctxs = get(argv.plan, ctxOpts);
+    let ctxs = get(argv.planText, ctxOpts);
 
     ctxs.forEach((ctx, i) => {
       log(i + 1, ctx);
       actOpts.filterVal = i;
-      let acts = get(argv.plan, actOpts);
+      let acts = get(argv.planText, actOpts);
       acts.forEach((act, i) => {
         log('  ', i + 1, act);
       });

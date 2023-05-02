@@ -16,7 +16,7 @@ export function handleSet(argv) {
       value: argv.value,
     };
 
-    newPlan = set(argv.plan, opts);
+    newPlan = set(argv.planTextTextText, opts);
   } else {
     const opts = {
       type: 'context',
@@ -25,7 +25,7 @@ export function handleSet(argv) {
       value: argv.value,
     };
 
-    newPlan = set(argv.plan, opts);
+    newPlan = set(argv.planTextTextText, opts);
   }
   writePlan(newPlan);
 }

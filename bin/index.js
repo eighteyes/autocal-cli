@@ -7,8 +7,8 @@ import { get, set, select } from 'autocal-core';
 import yargs from 'yargs/yargs';
 import { log, error } from 'console';
 
-import { readConfig, writePlan } from './io.js';
-import { handleList } from './list.js';
+import { readConfig, writePlan, loadPlan } from './io.js';
+import { handleList, handleListAll } from './list.js';
 import { handleSet } from './set.js';
 import { handleSelect } from './select.js';
 import { handleAdd } from './add.js';
@@ -21,6 +21,12 @@ const usage = '\nUsage: acal [list|get|set|select]';
 const options = yargs(process.argv.slice(2))
   .usage(usage)
   .config(readConfig())
+  .option('p', {
+    alias: 'plan',
+    describe: 'Plan number',
+    type: 'number',
+    demandOption: false,
+  })
   .option('c', {
     alias: 'context',
     describe: 'Context Number',
@@ -38,14 +44,16 @@ const options = yargs(process.argv.slice(2))
     default: 3,
     describe: 'How many activities to select',
   })
+  .command('list-all', 'list all plans', () => {}, handleListAll)
   .command(
-    ['list'],
+    'list [context]',
     'list plan or context',
-    (yargs) =>
-      yargs.positional('context', {
+    (yargs) => {
+      return yargs.positional('context', {
         describe: 'Context to list',
         type: 'number',
-      }),
+      });
+    },
     handleList
   )
   .command(
@@ -94,7 +102,7 @@ const options = yargs(process.argv.slice(2))
     handleMakePlan
   )
   .command('del', 'delete the thing')
-  .middleware([buildVal, setCtx])
+  .middleware([loadPlan, buildVal, setCtx])
   .example([
     ['$0 add -c 1 A new Task ! #tag', 'Add a new task to context 1'],
     ['$0 set -c 1 -a 1 Renamed task', 'Swap out one for another'],
@@ -108,9 +116,16 @@ function buildVal(argv) {
   }
 }
 
+function loadPlan(argv) {}
 function setCtx(argv) {
-  if (argv.plan.length == 0 || argv._[0] == 'list') {
+  if (
+    argv.plan.length == 0 ||
+    ['list', 'plan', 'list-all', 'config'].includes(argv._[0])
+  ) {
     return;
+  }
+  if (argv.plan) {
+    argv.config.selectedPlan = argv.planText;
   }
   if (argv.context) {
     argv.config.selectedContext = argv.context;
@@ -121,6 +136,6 @@ function setCtx(argv) {
     lookup: 'display',
     filterVal: argv.config.selectedContext,
   };
-  const ctxName = get(argv.plan, opts)[0];
+  const ctxName = get(argv.planText, opts)[0];
   console.log(`Selected Context: %s`, chalk.green(ctxName));
 }

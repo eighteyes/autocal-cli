@@ -5,5 +5,5 @@ export function lookupContextName(id) {
     lookup: 'display',
     filterVal: id - 1,
   };
-  return get(argv.plan, opts)[0];
+  return get(argv.planText, opts)[0];
 }
