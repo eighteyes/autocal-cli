@@ -44,6 +44,19 @@ const options = yargs(process.argv.slice(2))
     default: 3,
     describe: 'How many activities to select',
   })
+  .option('f', {
+    alias: 'file',
+    describe: 'File Input',
+    type: 'string',
+    demandOption: false,
+  })
+  .option('g', {
+    alias: 'global',
+    describe: 'Target Global Contexts',
+    type: 'boolean',
+    default: true,
+    demandOption: false,
+  })
   .command('list-all', 'list all plans', () => {}, handleListAll)
   .command(
     'list [context]',
@@ -79,7 +92,7 @@ const options = yargs(process.argv.slice(2))
     handleSet
   )
   .command(
-    'select <pattern|ordered|random>',
+    ['select <pattern|ordered|random>', '$0'],
     'Select activities to accomplish',
     (yargs) => {
       yargs.positional('value', {
@@ -115,8 +128,6 @@ function buildVal(argv) {
     argv.value = argv.value.join(' ');
   }
 }
-
-function loadPlan(argv) {}
 function setCtx(argv) {
   if (
     argv.plan.length == 0 ||

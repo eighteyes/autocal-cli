@@ -28,7 +28,7 @@ export function handleList(argv) {
     };
     let acts = get(argv.planText, opts);
     acts.forEach((act, i) => {
-      log(i + 1, act);
+            log(i + 1, act);
     });
   } else {
     let ctxOpts = {
